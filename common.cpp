@@ -942,11 +942,20 @@ BOOL ListView_GetCheckByParam(HWND hLV, LPARAM param)
 int ListView_InsertItemWithParam(HWND hLV, int item_index, LPARAM param)
 {
 	LVITEM lvItem;
-	lvItem.mask  = LVIF_PARAM;
+	ZeroMemory(&lvItem, sizeof(LVITEM));
+	if(item_index == -1)
+		item_index = ListView_GetItemCount(hLV);
+	lvItem.iItem = item_index;
+	lvItem.mask = LVIF_PARAM;
 	lvItem.lParam = param;
 	lvItem.iSubItem = 0;
-	lvItem.iItem = item_index;
-	return ListView_InsertItem(hLV, &lvItem);
+	int res = ListView_InsertItem(hLV, &lvItem);
+
+	lvItem.mask = LVIF_TEXT;
+	lvItem.pszText = const_cast<LPSTR>("0");
+	lvItem.iSubItem = 1;
+	ListView_SetItem(hLV, &lvItem);
+	return res;
 }
 void ListView_AddColumn(HWND hLV, LPCTSTR caption, int subitem, int width, int order)
 {
@@ -968,6 +977,17 @@ void ListView_Activate(HWND hDlg, HWND hLV, INT id)
 	if (di.iItem == -1)
 		return;
 	SendMessage(hDlg, WM_NOTIFY, 0, (LPARAM)&di);
+}
+int ListView_GetItemByParam(HWND hLV, LPARAM param)
+{
+	int res = -1;
+	int count = ListView_GetItemCount(hLV);
+	for (int i = 0; i < count; i++)
+	{
+		if(ListView_GetItemParam(hLV, i) == param)
+			return i;
+	}
+	return res;
 }
 BOOL IsDirectory(LPCTSTR file)
 {
@@ -1328,4 +1348,28 @@ BOOL SetStringOption(LPCTSTR app_name, LPCTSTR opt_name, LPCTSTR opt_val, BOOL g
 		RegCloseKey(app_key);
 	}
 	return res;
+}
+std::vector<std::tstring> GetDroppedFiles(HWND hWnd, HDROP hDrop)
+{
+	std::vector<std::tstring> res;
+	UINT nFiles = DragQueryFile(hDrop, 0xFFFFFFFF, NULL, 0);
+	TCHAR* str;
+	for (UINT i = 0; i < nFiles; i++)
+	{
+		UINT size = DragQueryFile(hDrop, i, NULL, 0);
+		str = new TCHAR[size + 1];
+		DragQueryFile(hDrop, i, str, size + 1);
+		res.push_back(str);
+		delete [] str;
+	}
+	DragFinish(hDrop);
+	return res;
+}
+UINT GetRandomNumber(UINT start, UINT end)
+{
+	UINT res;
+	if (start >= end)
+		return start;
+	rand_s(&res);
+	return floor(double(res) / UINT_MAX * (end - start) + start+0.5);
 }

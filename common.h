@@ -214,7 +214,7 @@ BOOL ListView_GetCheckByParam(HWND hLV, LPARAM param);
 int ListView_InsertItemWithParam(HWND hLV, int item_index, LPARAM param);
 void ListView_AddColumn(HWND hLV, LPCTSTR caption, int subitem, int width, int order = -1);
 void ListView_Activate(HWND hDlg, HWND hLV, INT id);
-
+int ListView_GetItemByParam(HWND hLV, LPARAM param);
 class FileAction
 {
 public:
@@ -281,3 +281,7 @@ std::tstring GetStringOption(LPCTSTR app_name, LPCTSTR opt_name, LPCTSTR default
 BOOL SetDWORDOption(LPCTSTR app_name, LPCTSTR opt_name, DWORD opt_val, BOOL global = FALSE);
 BOOL SetQWORDOption(LPCTSTR app_name, LPCTSTR opt_name, ULONGLONG opt_val, BOOL global = FALSE);
 BOOL SetStringOption(LPCTSTR app_name, LPCTSTR opt_name, LPCTSTR opt_val, BOOL global = FALSE);
+
+//WM_DROPFILES
+std::vector<std::tstring> GetDroppedFiles(HWND hWnd, HDROP hDrop);
+UINT GetRandomNumber(UINT start = 0, UINT end = 100);
