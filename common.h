@@ -82,8 +82,8 @@ std::vector<std::tstring> ChooseFilesFormat(HWND hWndOwner, LPCTSTR tCaption, LP
 
 int CreateDirFull(LPCTSTR);
 int CreateFileFull(LPCTSTR);
-std::string CreateRandomNameA(DWORD dwNumChars, LPCSTR ptPrefix, LPCSTR ptPostfix);
-std::wstring CreateRandomNameW(DWORD dwNumChars, LPCWSTR ptPrefix, LPCWSTR ptPostfix);
+std::string CreateRandomNameA(DWORD dwNumChars, LPCSTR ptPrefix="", LPCSTR ptPostfix="");
+std::wstring CreateRandomNameW(DWORD dwNumChars, LPCWSTR ptPrefix=L"", LPCWSTR ptPostfix=L"");
 
 LPCTSTR GetExtention(LPCTSTR ptName);
 std::tstring ExpandPath(LPCTSTR ptPath);

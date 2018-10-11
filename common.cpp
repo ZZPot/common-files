@@ -1,5 +1,4 @@
 #define _CRT_RAND_S
-
 #include "common.h"
 #include <stdlib.h>
 #include <shlobj.h>
@@ -1113,7 +1112,7 @@ std::tstring cmd_option::GetOptionDescription()
 {
 	std::tstring res;
 	res = _option_name;
-	res += "\ ";
+	res += "\t";
 	if (_paramized) 
 		res += "<param> "; // надо добавить именованый параметр
 	res += _descr;
