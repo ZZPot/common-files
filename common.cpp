@@ -1370,5 +1370,5 @@ UINT GetRandomNumber(UINT start, UINT end)
 	if (start >= end)
 		return start;
 	rand_s(&res);
-	return floor(double(res) / UINT_MAX * (end - start) + start+0.5);
+	return floor(double(res) / UINT_MAX * (end - start) + start);
 }
