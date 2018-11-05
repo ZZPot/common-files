@@ -1372,3 +1372,25 @@ UINT GetRandomNumber(UINT start, UINT end)
 	rand_s(&res);
 	return floor(double(res) / UINT_MAX * (end - start) + start);
 }
+unsigned GetRandomChoice(std::vector<double> probs)
+{
+	unsigned res = 0;
+	if (!probs.size())
+		return res;
+	double sum_power = 0;
+	for (auto& prob : probs)
+	{
+		sum_power += prob;
+	}
+	double random_num_d = double(GetRandomNumber()) / UINT_MAX * sum_power;
+	for (unsigned i = 0; i < probs.size(); i++)
+	{
+		random_num_d -= probs[i];
+		if (random_num_d <= 0)
+		{
+			res = i;
+			break;
+		}
+	}
+	return res;
+}

@@ -284,4 +284,6 @@ BOOL SetStringOption(LPCTSTR app_name, LPCTSTR opt_name, LPCTSTR opt_val, BOOL g
 
 //WM_DROPFILES
 std::vector<std::tstring> GetDroppedFiles(HWND hWnd, HDROP hDrop);
-UINT GetRandomNumber(UINT start = 0, UINT end = 100);
+UINT GetRandomNumber(UINT start = 0, UINT end = UINT_MAX);
+// Making choice based on probabilities
+unsigned GetRandomChoice(std::vector<double> probs);
