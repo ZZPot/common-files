@@ -146,6 +146,8 @@ VOID SetValidDate(SYSTEMTIME* st);
 extern const UINT month_days[];
 
 std::tstring GetFileName(std::tstring file_path);
+std::tstring GetFileDir(std::tstring file_path);
+std::tstring GetStreamName(std::tstring stream);
 
 template<class T>
 struct ts_state

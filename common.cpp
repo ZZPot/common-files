@@ -6,7 +6,7 @@
 
 #pragma comment(lib, "shell32.lib")
 #pragma comment(lib, "Comdlg32.lib")
-#pragma warning(disable: 4267 4996 4244 4311)
+#pragma warning(disable: 4267 4996 4244 4311 4302 4477)
 
 DWORD BreakCmd(PTCHAR cmdLine, PTCHAR* pointers, SIZE_T nPointers)
 {
@@ -508,13 +508,13 @@ std::vector<std::tstring> ChooseFilesFormat(HWND hWndOwner, LPCTSTR tCaption, LP
 			res.push_back(ofn.lpstrFile);
 		else
 		{
-			std::string file_folder = ofn.lpstrFile;
-			file_folder += '\\';
-			LPSTR file_ptr = ofn.lpstrFile + strlen(ofn.lpstrFile) + 1;
-			while (strlen(file_ptr))
+			std::tstring file_folder = ofn.lpstrFile;
+			file_folder += _T('\\');
+			LPTSTR file_ptr = ofn.lpstrFile + _tcslen(ofn.lpstrFile) + 1;
+			while (_tcslen(file_ptr))
 			{
 				res.push_back(file_folder + file_ptr);
-				file_ptr += strlen(file_ptr) + 1;
+				file_ptr += _tcslen(file_ptr) + 1;
 			}
 		}
 	}
@@ -771,6 +771,24 @@ std::tstring GetFileName(std::tstring file_path)
 		return _T("");
 	return file_path.substr(pos+1);
 }
+std::tstring GetFileDir(std::tstring file_path)
+{
+	int pos = file_path.rfind(_T('\\'));
+	if (pos == file_path.npos)
+		return file_path;
+	if (pos == file_path.length() - 1)
+		return _T("");
+	return file_path.substr(0, pos);
+}
+std::tstring GetStreamName(std::tstring stream)
+{
+	if (stream.length() < 2) // should at least has two '::' and stream type
+		return _T("");
+	int pos = stream.rfind(_T(':'));
+	if (pos == stream.npos)
+		return _T("");
+	return stream.substr(1, pos-1);
+}
 void FTtoLT(FILETIME* ft)
 {
 	FILETIME loc_ft;
@@ -951,7 +969,7 @@ int ListView_InsertItemWithParam(HWND hLV, int item_index, LPARAM param)
 	int res = ListView_InsertItem(hLV, &lvItem);
 
 	lvItem.mask = LVIF_TEXT;
-	lvItem.pszText = const_cast<LPSTR>("0");
+	lvItem.pszText = const_cast<LPTSTR>(_T("0"));
 	lvItem.iSubItem = 1;
 	ListView_SetItem(hLV, &lvItem);
 	return res;
@@ -1045,7 +1063,7 @@ BOOL CrawlFolder(LPCTSTR first_dir, unsigned max_depth, unsigned cur_depth, File
 	return res;
 }
 
-cmd_option::cmd_option(LPCTSTR option_name, bool paramized, std::string descr, std::list<std::tstring> ac_list):
+cmd_option::cmd_option(LPCTSTR option_name, bool paramized, std::tstring descr, std::list<std::tstring> ac_list):
 _paramized(paramized)
 {
 	_option_name = option_name;
@@ -1112,9 +1130,9 @@ std::tstring cmd_option::GetOptionDescription()
 {
 	std::tstring res;
 	res = _option_name;
-	res += "\t";
+	res += _T("\t");
 	if (_paramized) 
-		res += "<param> "; // надо добавить именованый параметр
+		res += _T("<param> "); // надо добавить именованый параметр
 	res += _descr;
 	return res;
 }
