@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <shlobj.h>
 #include <windowsx.h>
+#include <map>
 
 #pragma comment(lib, "shell32.lib")
 #pragma comment(lib, "Comdlg32.lib")
@@ -1184,7 +1185,7 @@ bool CmdLine::SetCmd(LPCTSTR cmd_line)
 	cmd_dup =_tcsdup(cmd_line);
 	BreakCmd(cmd_dup, args, argc);
 	is_set = true;
-	for(unsigned i = 1; i < argc; i++)
+	for(unsigned i = 0; i < argc; i++)
 	{
 		cmd_option* cur_option = GetOption(args[i]);
 		if(!cur_option)
@@ -1411,4 +1412,38 @@ unsigned GetRandomChoice(std::vector<double> probs)
 		}
 	}
 	return res;
+}
+void MakeInputSeq(TCHAR c, std::vector<INPUT>* inp_v)
+{
+	static HKL layout = LoadKeyboardLayout(_T("00000409"), KLF_ACTIVATE | KLF_NOTELLSHELL);
+	static std::map<BYTE, WORD> ctl_to_vc = {{1, VK_LSHIFT}, {2, VK_CONTROL}};
+	
+	INPUT temp;
+	temp.type = INPUT_KEYBOARD;
+	temp.ki.time = 0;
+	temp.ki.dwFlags = 0;
+	WORD vcode = VkKeyScanEx(c, layout);
+	BYTE controls = HIBYTE(vcode);
+	for(auto vc : ctl_to_vc)
+	{
+		if(controls & vc.first)
+		{
+			temp.ki.wVk = vc.second;
+			inp_v->push_back(temp);
+		}
+	}
+	temp.ki.wVk = LOBYTE(vcode);
+	inp_v->push_back(temp);
+
+	temp.ki.dwFlags = KEYEVENTF_KEYUP;
+	for (auto vc : ctl_to_vc)
+	{
+		if (controls & vc.first)
+		{
+			temp.ki.wVk = vc.second;
+			inp_v->push_back(temp);
+		}
+	}
+	temp.ki.wVk = LOBYTE(vcode);
+	inp_v->push_back(temp);
 }

@@ -289,3 +289,5 @@ std::vector<std::tstring> GetDroppedFiles(HWND hWnd, HDROP hDrop);
 UINT GetRandomNumber(UINT start = 0, UINT end = UINT_MAX);
 // Making choice based on probabilities
 unsigned GetRandomChoice(std::vector<double> probs);
+
+void MakeInputSeq(TCHAR c, std::vector<INPUT>* inp_v);
