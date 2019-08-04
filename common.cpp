@@ -1179,7 +1179,7 @@ bool CmdLine::SetCmd(LPCTSTR cmd_line)
 		return false;
 	ResetCmd();
 	PTCHAR cmd_dup = _tcsdup(cmd_line);
-	DWORD argc = BreakCmd(cmd_dup, NULL, 0);
+	DWORD argc = BreakCmd(cmd_dup, nullptr, 0);
 	free(cmd_dup);
 	PTCHAR* args = new PTCHAR[argc];
 	cmd_dup =_tcsdup(cmd_line);
