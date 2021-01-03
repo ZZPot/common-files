@@ -291,3 +291,19 @@ UINT GetRandomNumber(UINT start = 0, UINT end = UINT_MAX);
 unsigned GetRandomChoice(std::vector<double> probs);
 
 void MakeInputSeq(TCHAR c, std::vector<INPUT>* inp_v);
+
+template<class T> std::string NumToChar(T num)
+{
+	return std::to_string(num);
+}
+
+template<class T> std::wstring NumToWchar(T num)
+{
+	return std::to_wstring(num);
+} 
+
+#ifdef _UNICODE
+	#define NumToTchar NumToWchar
+#else
+	#define NumToTchar NumToChar
+#endif
