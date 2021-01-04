@@ -229,52 +229,6 @@ BOOL IsDirectory(LPCTSTR file);
 //ExecuteFolder
 BOOL CrawlFolder(LPCTSTR first_dir, unsigned max_depth, unsigned cur_depth, FileAction* file_action);
 
-class cmd_option
-{
-public:
-	cmd_option(LPCTSTR option_name, bool paramized, std::tstring descr, std::list<std::tstring> ac_list = std::list<std::tstring>());
-	std::tstring GetName();
-	bool IsParamized();
-	bool Set(LPCTSTR param = NULL);
-	void Reset();
-	bool IsSet();
-	int GetInt();
-	std::tstring GetString();
-	std::tstring GetOptionDescription();
-protected:
-	std::tstring _option_name;
-	bool is_set;
-	const bool _paramized;
-	std::tstring _descr;
-	std::tstring _param;
-	std::list<std::tstring> _acceptable;
-};
-
-class CmdLine
-{
-public:
-	CmdLine();
-	virtual ~CmdLine();
-	operator bool(); // корректно ли выставлены опции
-	bool AddOption(	LPCTSTR option_name, // полное имя опции
-					bool param, // параметризирована ли опция
-					std::tstring descr, // описание опции
-					std::list<std::tstring> ac_list = std::list<std::tstring>()); // список допустимых параметров
-	bool DeleteOption(LPCTSTR option_name);
-	bool SetCmd(LPCTSTR cmd_line);
-	void ResetCmd();
-	bool Set(LPCTSTR option_name, LPCTSTR param = NULL);
-	bool Reset(LPCTSTR option_name);
-	bool IsSet(LPCTSTR option_name);
-	int GetInt(LPCTSTR option_name);
-	std::tstring GetString(LPCTSTR option_name);
-	void ShowUsage(); // только опции, без шаблона вызова
-protected:
-	cmd_option* GetOption(LPCTSTR option_name);
-	std::list<cmd_option*> options_list;
-	bool is_set;
-};
-
 #define SOFTWARE_KEY	_T("SOFTWARE")
 
 DWORD GetDWORDOption(LPCTSTR app_name, LPCTSTR opt_name, DWORD default_val, BOOL global = FALSE); 
