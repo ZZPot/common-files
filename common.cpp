@@ -344,30 +344,25 @@ std::string CreateRandomNameA(DWORD dwNumChars, LPCSTR ptPrefix, LPCSTR ptPostfi
 }
 std::wstring CreateRandomNameW(DWORD dwNumChars, LPCWSTR ptPrefix, LPCWSTR ptPostfix)
 {
-	std::wstring strNewName = L"";
+	std::wstring res = L"";
 	if(ptPrefix)
-		strNewName = ptPrefix;
+		res = ptPrefix;
 	if(dwNumChars)
 	{
 		if(dwNumChars > RANDOM_NAME_MAX_CHARS)
 			dwNumChars = RANDOM_NAME_MAX_CHARS;
-		DWORD dwRandomChunkSize = 5;
-		SIZE_T sCharsToAlloc = ((dwNumChars+dwRandomChunkSize-1)/dwRandomChunkSize)*dwRandomChunkSize;
-		DWORD dwChunks = sCharsToAlloc / dwRandomChunkSize;
-		WCHAR* ptNewName = new WCHAR[sCharsToAlloc+1]; ptNewName[0] = L'\0';
+		TCHAR charset[] = _T("0123456789");
+		UINT charsetSize = _tcslen(charset);
 		UINT uRand;
-		for(DWORD i = 0; i < dwChunks; i++)
+		for(DWORD i = 0; i < dwNumChars; i++)
 		{
 			rand_s(&uRand);
-			swprintf(ptNewName, L"%s%05d", ptNewName, uRand%100000);
+			res += charset[uRand % charsetSize];
 		}
-		ptNewName[dwNumChars] = L'\0';
-		strNewName += ptNewName;
-		delete [] ptNewName;
 	}
 	if(ptPostfix)
-		strNewName += ptPostfix;
-	return strNewName;
+		res += ptPostfix;
+	return res;
 }
 LPCTSTR GetExtention(LPCTSTR ptName)
 {
