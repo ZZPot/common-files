@@ -4,6 +4,8 @@
 #include <shlobj.h>
 #include <windowsx.h>
 #include <map>
+#include <algorithm>
+
 
 #pragma comment(lib, "shell32.lib")
 #pragma comment(lib, "Comdlg32.lib")
@@ -282,10 +284,11 @@ INT IsImage(LPCTSTR file)
 BOOL HasExt(LPCTSTR file, LPCTSTR ext)
 {
 	BOOL res = FALSE;
-	if(!ext)
+	if(ext == nullptr)
 		return TRUE;
-	if(!file)
+	if(file == nullptr)
 		return FALSE;
+	//////////////////// <<<<<<<<<<<<<VVVVVVVVVVVVVVVVVVVVVVVVVVVVV
 	PTCHAR ext_str = new TCHAR[_tcslen(ext)+1];
 	_tcscpy(ext_str, ext);
 	std::list<PTCHAR> ext_list;
@@ -452,29 +455,22 @@ std::tstring ChoosePath(HWND hWndOwner, LPCTSTR tCaption)
 }
 std::tstring ChooseFile(HWND hWndOwner, LPCTSTR tCaption)
 {
-	std::tstring res(_T(""));
-	OPENFILENAME ofn;
-	memset(&ofn, 0, sizeof(ofn));
-	ofn.lStructSize = sizeof(OPENFILENAME);
-	ofn.hwndOwner = hWndOwner;
-	ofn.lpstrFilter = _T("Text files (*.txt)\0*.TXT\0All files\0*\0");
-	ofn.lpstrFile = new TCHAR[MAX_PATH*2]; ofn.lpstrFile[0] = _T('\0');
-	ofn.nMaxFile = MAX_PATH*2-1;
-	ofn.lpstrTitle = tCaption;
-	ofn.Flags = OFN_EXPLORER | OFN_HIDEREADONLY | OFN_NOCHANGEDIR;
-	if(GetOpenFileName(&ofn))
-		res = ofn.lpstrFile;
-	delete [] ofn.lpstrFile;
-	return res;
+	return commonFunc::OpenFile(hWndOwner, tCaption, _T("Text files (*.txt)\0*.TXT\0All files\0*\0"));
 }
 std::tstring ChooseFileFormat(HWND hWndOwner, LPCTSTR tCaption, LPCTSTR szFormat)
+{
+	return commonFunc::OpenFile(hWndOwner, tCaption, szFormat);
+}
+namespace commonFunc
+{
+std::tstring OpenFile(HWND hWndOwner, LPCTSTR tCaption, LPCTSTR tFilter)
 {
 	std::tstring res(_T(""));
 	OPENFILENAME ofn;
 	memset(&ofn, 0, sizeof(ofn));
 	ofn.lStructSize = sizeof(OPENFILENAME);
 	ofn.hwndOwner = hWndOwner;
-	ofn.lpstrFilter = szFormat;
+	ofn.lpstrFilter = tFilter;
 	ofn.lpstrFile = new TCHAR[MAX_PATH * 2];
 	ofn.lpstrFile[0] = _T('\0');
 	ofn.nMaxFile = MAX_PATH * 2 - 1;
@@ -485,6 +481,38 @@ std::tstring ChooseFileFormat(HWND hWndOwner, LPCTSTR tCaption, LPCTSTR szFormat
 	delete[] ofn.lpstrFile;
 	return res;
 }
+std::tstring SaveFile(HWND hWndOwner, LPCTSTR tFilename, LPCTSTR tCaption, LPCTSTR tFilter)
+{
+	std::tstring res(_T(""));
+	OPENFILENAME ofn;
+	memset(&ofn, 0, sizeof(ofn));
+	ofn.lStructSize = sizeof(OPENFILENAME);
+	ofn.hwndOwner = hWndOwner;
+	ofn.lpstrFilter = tFilter;
+	ofn.lpstrFile = new TCHAR[MAX_PATH * 2];
+	ofn.lpstrFile[0] = _T('\0');
+	if(tFilename != nullptr)
+	{
+		_tcscpy_s(ofn.lpstrFile, MAX_PATH*2, tFilename);
+	}
+	ofn.nMaxFile = MAX_PATH * 2 - 1;
+	ofn.lpstrTitle = tCaption;
+	ofn.Flags = OFN_EXPLORER | OFN_HIDEREADONLY | OFN_NOCHANGEDIR;
+	if (GetSaveFileName(&ofn))
+		res = ofn.lpstrFile;
+	delete[] ofn.lpstrFile;
+	return res;
+}
+std::tstring MakeSafeFilename(std::tstring filename)
+{
+	// in Windows these symbols are not allowed in filepath \/:*?"<>|
+	std::tregex disSymbols(_T("[\\/:*?\"<>|]"));
+	//std::tregex disSymbols(_T("\\|a"));
+	return std::regex_replace(filename, disSymbols, _T("-"));
+}
+}
+
+
 std::vector<std::tstring> ChooseFilesFormat(HWND hWndOwner, LPCTSTR tCaption, LPCTSTR szFormat)
 {
 	std::vector<std::tstring> res;
@@ -1228,4 +1256,17 @@ void MakeInputSeq(TCHAR c, std::vector<INPUT>* inp_v)
 	}
 	temp.ki.wVk = LOBYTE(vcode);
 	inp_v->push_back(temp);
+}
+
+namespace commonFunc
+{
+	std::tstring GetDesktopPath()
+	{
+		TCHAR expandedStr[MAX_PATH];
+		// Need check for too-small buffer case!
+		DWORD err = ExpandEnvironmentStrings(_T("%UserProfile%\\Desktop\\"), expandedStr, MAX_PATH);
+		if(err == 0)
+			return _T("");
+		return expandedStr;
+	}
 }

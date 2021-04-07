@@ -5,6 +5,7 @@
 #include <string>
 #include <list>
 #include <vector>
+#include <regex>
 
 typedef unsigned (__stdcall *PTHREAD_FUNC)(PVOID);
 #define BeginThreadEx(LPSA, SSIZE, PFUNC, pvARG, FLAGS, PTID) \
@@ -63,8 +64,18 @@ BOOL HasExt(LPCTSTR file, LPCTSTR ext);
 BOOL IsURL(LPCTSTR str); //проверяет является ли строка путём к файлу, ссылкой или ни тем, ни другим
 DWORD LurkFolder(LPCTSTR ptDir, DWORD dwDepth, DWORD dwMaxDepth, std::list<std::tstring>* file_list, LPCTSTR ptTypes);
 std::tstring ChoosePath(HWND hWndOwner, LPCTSTR tCaption);
+// deprecated.cpp
+// Use commonFunc::OpenFile() instead
 std::tstring ChooseFile(HWND hWndOwner, LPCTSTR tCaption);
+// deprecated.cpp
+// Use commonFunc::OpenFile() instead
 std::tstring ChooseFileFormat(HWND hWndOwner, LPCTSTR tCaption, LPCTSTR szFormat);
+namespace commonFunc
+{
+	std::tstring OpenFile(HWND hWndOwner, LPCTSTR tCaption, LPCTSTR tFilter);
+	std::tstring SaveFile(HWND hWndOwner, LPCTSTR tFilename, LPCTSTR tCaption, LPCTSTR tFilter);
+	std::tstring MakeSafeFilename(std::tstring filename);
+}
 std::vector<std::tstring> ChooseFilesFormat(HWND hWndOwner, LPCTSTR tCaption, LPCTSTR szFormat);
 
 #define NOT_IMAGE	0
@@ -261,3 +272,13 @@ template<class T> std::wstring NumToWchar(T num)
 #else
 	#define NumToTchar NumToChar
 #endif
+
+#ifdef _UNICODE
+#define tregex wregex
+#else
+#define tregex regex
+#endif
+namespace commonFunc
+{
+	std::tstring GetDesktopPath();
+}
