@@ -1262,11 +1262,10 @@ namespace commonFunc
 {
 	std::tstring GetDesktopPath()
 	{
-		TCHAR expandedStr[MAX_PATH];
-		// Need check for too-small buffer case!
-		DWORD err = ExpandEnvironmentStrings(_T("%UserProfile%\\Desktop\\"), expandedStr, MAX_PATH);
-		if(err == 0)
+		TCHAR dtPath[MAX_PATH];
+		BOOL res = SHGetSpecialFolderPath(NULL, dtPath, CSIDL_DESKTOP, FALSE);
+		if(!res)
 			return _T("");
-		return expandedStr;
+		return dtPath;
 	}
 }
